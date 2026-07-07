@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Calcul Réfléchi - 6e</title>
+<title>Nombres Relatifs</title>
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body {
@@ -81,56 +81,18 @@
     color: #8a6d1e;
   }
 
-  .mode-option {
-    display: flex;
-    align-items: center;
-    padding: 14px;
-    margin-bottom: 10px;
-    border: 2px solid #dbe5ee;
-    border-radius: 14px;
-    cursor: pointer;
-    transition: all 0.15s;
+  .progress-bar-wrap {
+    height: 8px;
+    background: #e2e9ef;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
   }
-  .mode-option.selected {
-    border-color: #3b82c4;
-    background: #eaf3fb;
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82c4, #5fa8dd);
+    transition: width 0.25s;
   }
-  .mode-option .dot {
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    border: 2px solid #b8c8d6;
-    margin-right: 12px;
-    flex-shrink: 0;
-    position: relative;
-  }
-  .mode-option.selected .dot { border-color: #3b82c4; }
-  .mode-option.selected .dot::after {
-    content: '';
-    position: absolute;
-    top: 3px; left: 3px;
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: #3b82c4;
-  }
-  .mode-option .label { font-weight: 600; color: #1e3a5f; font-size: 0.98rem; }
-  .mode-option .desc { font-size: 0.82rem; color: #6b7f91; margin-top: 2px; }
-
-  .count-row { display: flex; gap: 10px; }
-  .count-btn {
-    flex: 1;
-    padding: 12px;
-    text-align: center;
-    border: 2px solid #dbe5ee;
-    border-radius: 12px;
-    font-weight: 600;
-    color: #2c5f8a;
-    cursor: pointer;
-  }
-  .count-btn.selected {
-    border-color: #3b82c4;
-    background: #eaf3fb;
-  }
-
   .quiz-header-row {
     display: flex;
     justify-content: flex-start;
@@ -146,19 +108,6 @@
     cursor: pointer;
   }
   .link-btn:active { opacity: 0.6; }
-
-  .progress-bar-wrap {
-    height: 8px;
-    background: #e2e9ef;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 8px;
-  }
-  .progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #3b82c4, #5fa8dd);
-    transition: width 0.25s;
-  }
   .quiz-top-row {
     display: flex;
     justify-content: space-between;
@@ -188,14 +137,10 @@
     letter-spacing: 0.03em;
   }
   .question-text {
-    font-size: 1.5rem;
+    font-size: 1.45rem;
     color: #1e3a5f;
     font-weight: 600;
     line-height: 1.4;
-  }
-  .question-text.long {
-    font-size: 1.1rem;
-    line-height: 1.6;
   }
   .question-hint {
     font-size: 0.85rem;
@@ -230,12 +175,12 @@
 
   .numpad {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 8px;
   }
   .numpad button {
     padding: 16px 0;
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     font-weight: 600;
     color: #1e3a5f;
     background: white;
@@ -245,7 +190,8 @@
     cursor: pointer;
   }
   .numpad button:active { background: #eaf3fb; }
-  .numpad button.func { color: #6b7f91; font-size: 1.1rem; }
+  .numpad button.func { color: #6b7f91; font-size: 1.05rem; }
+  .numpad button.sign { color: #b8403a; }
 
   .action-row {
     display: flex;
@@ -301,73 +247,28 @@
 
   <!-- ECRAN 1 : Nom -->
   <div class="screen active" id="screen-name">
-    <h1>🧮 Calcul Réfléchi<br><span style="font-size:0.9rem; font-weight:400; color:#5c7185;">Entraînement 6e</span></h1>
+    <h1>➕➖ Nombres Relatifs<br><span style="font-size:0.9rem; font-weight:400; color:#5c7185;">Les 4 opérations</span></h1>
     <div class="card">
       <h2>Ton prénom</h2>
       <input type="text" id="input-name" placeholder="Ex : Léo" autocomplete="off" autocapitalize="words">
-      <button class="btn" id="btn-name-next">Continuer</button>
+      <button class="btn" id="btn-name-next">Commencer (10 questions)</button>
     </div>
-    <div class="footer-note">Distributivité · Regroupements astucieux · Ordre de grandeur</div>
+    <div class="footer-note">Calculs simples et calculs avec règles de priorité</div>
   </div>
 
-  <!-- ECRAN 2 : Choix du mode -->
-  <div class="screen" id="screen-mode">
-    <h2 id="mode-greeting">Choisis un thème</h2>
-    <div class="card">
-      <div class="mode-option selected" data-mode="mix">
-        <div class="dot"></div>
-        <div>
-          <div class="label">Mélange</div>
-          <div class="desc">Un peu de tout, au hasard</div>
-        </div>
-      </div>
-      <div class="mode-option" data-mode="distrib">
-        <div class="dot"></div>
-        <div>
-          <div class="label">Distributivité simple</div>
-          <div class="desc">k × (a + b) ou k × (a − b)</div>
-        </div>
-      </div>
-      <div class="mode-option" data-mode="regroup">
-        <div class="dot"></div>
-        <div>
-          <div class="label">Regroupements astucieux</div>
-          <div class="desc">Additionner des décimaux malins</div>
-        </div>
-      </div>
-      <div class="mode-option" data-mode="ordre">
-        <div class="dot"></div>
-        <div>
-          <div class="label">Ordre de grandeur</div>
-          <div class="desc">Estimer rapidement un résultat</div>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <h2 style="margin-bottom:12px;">Nombre de questions</h2>
-      <div class="count-row">
-        <div class="count-btn" data-count="8">8</div>
-        <div class="count-btn selected" data-count="12">12</div>
-        <div class="count-btn" data-count="20">20</div>
-      </div>
-    </div>
-    <button class="btn" id="btn-start-quiz">Commencer</button>
-    <button class="btn secondary" id="btn-back-name">Retour</button>
-  </div>
-
-  <!-- ECRAN 3 : Quiz -->
+  <!-- ECRAN 2 : Quiz -->
   <div class="screen" id="screen-quiz">
     <div class="quiz-header-row">
-      <button class="link-btn" id="btn-quiz-change-mode">← Changer de sujet</button>
+      <button class="link-btn" id="btn-quiz-restart">← Recommencer</button>
     </div>
     <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill"></div></div>
     <div class="quiz-top-row">
-      <span id="quiz-progress-text">Question 1/12</span>
+      <span id="quiz-progress-text">Question 1/10</span>
       <span class="score-badge" id="quiz-score-text">Score : 0</span>
     </div>
 
     <div class="question-box">
-      <div class="question-tag" id="question-tag">MODE</div>
+      <div class="question-tag" id="question-tag">CALCUL</div>
       <div class="question-text" id="question-text">...</div>
       <div class="question-hint" id="question-hint"></div>
     </div>
@@ -376,10 +277,10 @@
     <div class="feedback-note" id="feedback-note"></div>
 
     <div class="numpad" id="numpad">
-      <button data-key="7">7</button><button data-key="8">8</button><button data-key="9">9</button>
-      <button data-key="4">4</button><button data-key="5">5</button><button data-key="6">6</button>
-      <button data-key="1">1</button><button data-key="2">2</button><button data-key="3">3</button>
-      <button data-key="." class="func">,</button><button data-key="0">0</button><button data-key="back" class="func">⌫</button>
+      <button data-key="7">7</button><button data-key="8">8</button><button data-key="9">9</button><button data-key="back" class="func">⌫</button>
+      <button data-key="4">4</button><button data-key="5">5</button><button data-key="6">6</button><button data-key="sign" class="sign">±</button>
+      <button data-key="1">1</button><button data-key="2">2</button><button data-key="3">3</button><button data-key="0">0</button>
+      <button data-key="." class="func" style="grid-column: span 2;">,</button>
     </div>
 
     <div class="action-row">
@@ -388,7 +289,7 @@
     </div>
   </div>
 
-  <!-- ECRAN 4 : Résultats -->
+  <!-- ECRAN 3 : Résultats -->
   <div class="screen" id="screen-results">
     <h2>Résultats</h2>
     <div class="card results-summary">
@@ -397,7 +298,6 @@
     </div>
     <div class="card" id="breakdown-card" style="max-height:340px; overflow-y:auto;"></div>
     <button class="btn" id="btn-retry">Recommencer</button>
-    <button class="btn secondary" id="btn-change-mode">Changer de thème</button>
   </div>
 
 </div>
@@ -406,176 +306,182 @@
 (function(){
   "use strict";
 
+  const TOTAL_QUESTIONS = 10;
+
   // ---------- Utilitaires aléatoires ----------
-  function randInt(min, max) { // inclusif
+  function randInt(min, max) {
     const range = max - min + 1;
     const buf = new Uint32Array(1);
     crypto.getRandomValues(buf);
     return min + (buf[0] % range);
   }
   function randChoice(arr) { return arr[randInt(0, arr.length - 1)]; }
-  function fmt(n) {
-    // formate un nombre en notation FR (virgule), sans zéros inutiles
-    let r = Math.round(n * 1000) / 1000;
-    let s = r.toString().replace('.', ',');
-    return s;
-  }
+  function randSign() { return randInt(0, 1) === 1 ? 1 : -1; }
   function parseFR(str) {
     if (!str) return NaN;
     return parseFloat(str.replace(',', '.'));
   }
 
-  // ---------- Génération des exercices ----------
-  function genDistrib() {
-    // Choisit un facteur "proche d'un nombre rond" (ex: 99 proche de 100, 21 proche de 20)
-    const bases = [10, 20, 50, 100];
-    const base = randChoice(bases);
-    const delta = randChoice(base >= 50 ? [1, 2] : [1, 2, 3]);
-    const sign = randChoice([1, -1]);
-    const roundFactor = base + sign * delta;
-
-    let other;
-    if (base >= 100) other = randInt(4, 30);
-    else if (base >= 50) other = randInt(4, 40);
-    else if (base >= 20) other = randInt(4, 60);
-    else other = randInt(4, 80);
-
-    const answer = other * roundFactor;
-    const signWord = sign > 0 ? '+' : '−';
-    const orderSwap = randInt(0, 1) === 1;
-    const opText = orderSwap ? `${roundFactor} × ${other}` : `${other} × ${roundFactor}`;
-
-    // Exercice en 2 étapes : 1) le nombre de la décomposition, 2) le résultat final
-    // Gabarit : 24 × 99 = 24 × (100 − {0}) = 24 × 100 − 24 × {0} = {1}
-    const template = `${opText} = ${other} × (${base} ${signWord} {0}) = ${other} × ${base} ${signWord} ${other} × {0} = {1}`;
-
-    return {
-      tag: 'DISTRIBUTIVITÉ',
-      text: opText,
-      hint: 'Décompose le facteur proche d\'un nombre rond, puis distribue',
-      answer: answer,
-      tolerance: 0,
-      steps: [
-        { label: `Quel nombre complète la décomposition de ${roundFactor} ?`, value: delta },
-        { label: 'Quel est le résultat final ?', value: answer }
-      ],
-      template: template
-    };
+  // ---------- Génération de nombres relatifs ----------
+  function genNumber(minMag, maxMag, forceInt) {
+    const isDecimal = !forceInt && randInt(0, 9) < 4; // ~40% décimaux
+    let mag;
+    if (isDecimal) {
+      const maxD = Math.min(maxMag, 15);
+      mag = randInt(minMag * 10, maxD * 10) / 10;
+    } else {
+      mag = randInt(minMag, maxMag);
+    }
+    return randSign() * mag;
   }
 
-  function genRegroup() {
-    // génère 2 paires de décimaux dont la somme est un nombre rond
-    function pair(target) {
-      const d1tenths = randInt(1, target*10 - 1);
-      const d1 = d1tenths / 10;
-      const d2 = Math.round((target - d1) * 10) / 10;
-      if (d2 <= 0) return pair(target);
-      return [d1, d2];
+  function fmtAbs(n) {
+    const v = Math.abs(n);
+    let r = Math.round(v * 100) / 100;
+    return r.toString().replace('.', ',');
+  }
+  // affiche un nombre relatif ; les négatifs sont toujours entre parenthèses
+  function term(n) {
+    return n < 0 ? `(−${fmtAbs(n)})` : `${fmtAbs(n)}`;
+  }
+  function round2(n) { return Math.round(n * 100) / 100; }
+
+  // ---------- Type A : opération simple (sans parenthèses de priorité) ----------
+  function genSimple() {
+    const op = randChoice(['+', '−', '×', '÷']);
+    let a, b, answer;
+
+    if (op === '÷') {
+      b = genNumber(2, 12, true); // diviseur entier non nul
+      const q = genNumber(1, 12); // quotient (peut être décimal à 1 chiffre)
+      a = round2(b * q);
+      answer = q;
+    } else {
+      a = genNumber(1, 20);
+      b = genNumber(1, 20);
+      if (op === '+') answer = round2(a + b);
+      else if (op === '−') answer = round2(a - b);
+      else answer = round2(a * b);
     }
-    const targets = [10, 5, 20];
-    const t1 = randChoice(targets);
-    let t2 = randChoice(targets);
-    const [a, b] = pair(t1);
-    const [c, d] = pair(t2);
-    const nums = [a, b, c, d];
-    // mélange l'ordre d'affichage
-    for (let i = nums.length - 1; i > 0; i--) {
-      const j = randInt(0, i);
-      [nums[i], nums[j]] = [nums[j], nums[i]];
-    }
-    const answer = Math.round((a + b + c + d) * 10) / 10;
-    const text = nums.map(n => fmt(n)).join(' + ');
+
     return {
-      tag: 'REGROUPEMENT ASTUCIEUX',
-      text: text,
-      hint: 'Cherche les nombres qui font un compte rond',
+      tag: 'CALCUL SIMPLE',
+      text: `${term(a)} ${op} ${term(b)}`,
+      hint: 'Applique la règle des signes',
       answer: answer,
       tolerance: 0.01
     };
   }
 
-  function roundToOneSig(n) {
-    if (n === 0) return 0;
-    const sign = n < 0 ? -1 : 1;
-    n = Math.abs(n);
-    const exp = Math.floor(Math.log10(n));
-    const factor = Math.pow(10, exp);
-    return sign * Math.round(n / factor) * factor;
-  }
+  // ---------- Type B : règles opératoires (priorités / parenthèses) ----------
+  function genRules() {
+    const patterns = [
+      // a + b × c  (priorité naturelle : × d'abord)
+      () => {
+        const a = genNumber(1, 15), b = genNumber(1, 12), c = genNumber(1, 10);
+        const addOp = randChoice(['+', '−']);
+        const mulResult = round2(b * c);
+        const answer = round2(addOp === '+' ? a + mulResult : a - mulResult);
+        return {
+          text: `${term(a)} ${addOp} ${term(b)} × ${term(c)}`,
+          hint: 'Effectue la multiplication avant l\'addition/soustraction'
+        , answer};
+      },
+      // a × b + c
+      () => {
+        const a = genNumber(1, 12), b = genNumber(1, 10), c = genNumber(1, 15);
+        const addOp = randChoice(['+', '−']);
+        const mulResult = round2(a * b);
+        const answer = round2(addOp === '+' ? mulResult + c : mulResult - c);
+        return {
+          text: `${term(a)} × ${term(b)} ${addOp} ${term(c)}`,
+          hint: 'Effectue la multiplication avant l\'addition/soustraction'
+        , answer};
+      },
+      // (a + b) × c  -- parenthèses qui imposent l'ordre
+      () => {
+        const a = genNumber(1, 12), b = genNumber(1, 12), c = genNumber(1, 10, true);
+        const addOp = randChoice(['+', '−']);
+        const inner = round2(addOp === '+' ? a + b : a - b);
+        const answer = round2(inner * c);
+        return {
+          text: `(${term(a)} ${addOp} ${term(b)}) × ${term(c)}`,
+          hint: 'Calcule d\'abord la parenthèse'
+        , answer};
+      },
+      // a × (b + c)
+      () => {
+        const a = genNumber(1, 10, true), b = genNumber(1, 12), c = genNumber(1, 12);
+        const addOp = randChoice(['+', '−']);
+        const inner = round2(addOp === '+' ? b + c : b - c);
+        const answer = round2(a * inner);
+        return {
+          text: `${term(a)} × (${term(b)} ${addOp} ${term(c)})`,
+          hint: 'Calcule d\'abord la parenthèse'
+        , answer};
+      },
+      // a + b ÷ c  (division exacte garantie)
+      () => {
+        const c = genNumber(2, 10, true);
+        const q = genNumber(1, 10);
+        const b = round2(c * q);
+        const a = genNumber(1, 15);
+        const addOp = randChoice(['+', '−']);
+        const answer = round2(addOp === '+' ? a + q : a - q);
+        return {
+          text: `${term(a)} ${addOp} ${term(b)} ÷ ${term(c)}`,
+          hint: 'Effectue la division avant l\'addition/soustraction'
+        , answer};
+      },
+      // (a ÷ b) + c  (division exacte garantie, parenthèse explicite)
+      () => {
+        const b = genNumber(2, 10, true);
+        const q = genNumber(1, 10);
+        const a = round2(b * q);
+        const c = genNumber(1, 15);
+        const addOp = randChoice(['+', '−']);
+        const answer = round2(addOp === '+' ? q + c : q - c);
+        return {
+          text: `(${term(a)} ÷ ${term(b)}) ${addOp} ${term(c)}`,
+          hint: 'Calcule d\'abord la parenthèse'
+        , answer};
+      },
+      // a × b − c × d  (deux multiplications, priorité naturelle)
+      () => {
+        const a = genNumber(1, 9), b = genNumber(1, 9), c = genNumber(1, 9), d = genNumber(1, 9);
+        const midOp = randChoice(['+', '−']);
+        const p1 = round2(a * b), p2 = round2(c * d);
+        const answer = round2(midOp === '+' ? p1 + p2 : p1 - p2);
+        return {
+          text: `${term(a)} × ${term(b)} ${midOp} ${term(c)} × ${term(d)}`,
+          hint: 'Effectue les deux multiplications avant d\'additionner/soustraire'
+        , answer};
+      }
+    ];
 
-  function genOrdre() {
-    const type = randChoice(['mult', 'div', 'add', 'sub']);
-    let a, b, opSymbol, answer, tolerance;
-
-    if (type === 'mult') {
-      a = randInt(20, 95) + randChoice([0, 0.1, 0.5, 0.9]);
-      a = Math.round(a * 10) / 10;
-      b = randChoice([2.1, 3.9, 4.8, 5.2, 6.7, 7.9, 8.1, 9.4, 11, 19, 21, 48]);
-      opSymbol = '×';
-      const ra = roundToOneSig(a);
-      const rb = roundToOneSig(b);
-      answer = ra * rb;
-      tolerance = Math.max(1, Math.abs(answer) * 0.15);
-    } else if (type === 'div') {
-      a = randInt(200, 980);
-      b = randChoice([2.1, 3.9, 4.8, 5.2, 9.8, 19, 21, 48, 98]);
-      opSymbol = '÷';
-      const ra = roundToOneSig(a);
-      const rb = roundToOneSig(b);
-      answer = ra / rb;
-      tolerance = Math.max(1, Math.abs(answer) * 0.15);
-    } else if (type === 'add') {
-      a = randInt(20, 950) + randChoice([0, 0.1, 0.3, 0.5, 0.7, 0.9]);
-      a = Math.round(a * 10) / 10;
-      b = randInt(20, 950) + randChoice([0, 0.1, 0.3, 0.5, 0.7, 0.9]);
-      b = Math.round(b * 10) / 10;
-      opSymbol = '+';
-      const ra = roundToOneSig(a);
-      const rb = roundToOneSig(b);
-      answer = ra + rb;
-      tolerance = Math.max(1, Math.abs(answer) * 0.1);
-    } else {
-      // soustraction : on s'assure que a > b pour un résultat positif
-      a = randInt(200, 980) + randChoice([0, 0.1, 0.3, 0.5, 0.7, 0.9]);
-      a = Math.round(a * 10) / 10;
-      b = randInt(20, Math.floor(a) - 10) + randChoice([0, 0.1, 0.3, 0.5, 0.7, 0.9]);
-      b = Math.round(b * 10) / 10;
-      opSymbol = '−';
-      const ra = roundToOneSig(a);
-      const rb = roundToOneSig(b);
-      answer = ra - rb;
-      tolerance = Math.max(1, Math.abs(answer) * 0.15);
-    }
-
-    const aStr = (a % 1 === 0) ? a.toString() : fmt(a);
-    const bStr = (b % 1 === 0) ? b.toString() : fmt(b);
+    const chosen = randChoice(patterns)();
     return {
-      tag: 'ORDRE DE GRANDEUR',
-      text: `${aStr} ${opSymbol} ${bStr}`,
-      hint: 'Arrondis chaque nombre au chiffre le plus significatif',
-      answer: Math.round(answer * 1000) / 1000,
-      tolerance: tolerance
+      tag: 'RÈGLES DE PRIORITÉ',
+      text: chosen.text,
+      hint: chosen.hint,
+      answer: chosen.answer,
+      tolerance: 0.01
     };
   }
 
-  const generators = { distrib: genDistrib, regroup: genRegroup, ordre: genOrdre };
-
-  function genQuestion(mode) {
-    let m = mode;
-    if (mode === 'mix') m = randChoice(['distrib', 'regroup', 'ordre']);
-    return generators[m]();
+  function genQuestion() {
+    return (randInt(0, 1) === 1) ? genRules() : genSimple();
   }
 
   // ---------- Etat de l'application ----------
   const state = {
     name: '',
-    mode: 'mix',
-    total: 12,
+    total: TOTAL_QUESTIONS,
     index: 0,
     score: 0,
     currentAnswer: '',
     currentQuestion: null,
-    history: [], // {text, tag, status: 'ok'|'ko'|'skip', given, correct}
+    history: [],
     locked: false
   };
 
@@ -585,50 +491,19 @@
     document.getElementById(id).classList.add('active');
   }
 
-  // ---------- Ecran nom ----------
   document.getElementById('btn-name-next').addEventListener('click', () => {
     const val = document.getElementById('input-name').value.trim();
     state.name = val || 'Champion';
-    document.getElementById('mode-greeting').textContent = `Bien joué ${state.name}, choisis un thème`;
-    showScreen('screen-mode');
-  });
-  document.getElementById('input-name').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') document.getElementById('btn-name-next').click();
-  });
-
-  // ---------- Ecran mode ----------
-  document.querySelectorAll('.mode-option').forEach(el => {
-    el.addEventListener('click', () => {
-      document.querySelectorAll('.mode-option').forEach(o => o.classList.remove('selected'));
-      el.classList.add('selected');
-      state.mode = el.dataset.mode;
-    });
-  });
-  document.querySelectorAll('.count-btn').forEach(el => {
-    el.addEventListener('click', () => {
-      document.querySelectorAll('.count-btn').forEach(o => o.classList.remove('selected'));
-      el.classList.add('selected');
-      state.total = parseInt(el.dataset.count, 10);
-    });
-  });
-  document.getElementById('btn-back-name').addEventListener('click', () => showScreen('screen-name'));
-
-  document.getElementById('btn-quiz-change-mode').addEventListener('click', () => {
-    const confirmLeave = confirm('Quitter ce quiz et changer de sujet ? Ta progression actuelle sera perdue.');
-    if (confirmLeave) {
-      showScreen('screen-mode');
-    }
-  });
-
-  document.getElementById('btn-start-quiz').addEventListener('click', () => {
     state.index = 0;
     state.score = 0;
     state.history = [];
     showScreen('screen-quiz');
     nextQuestion();
   });
+  document.getElementById('input-name').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('btn-name-next').click();
+  });
 
-  // ---------- Ecran quiz ----------
   function updateTopBar() {
     document.getElementById('quiz-progress-text').textContent = `Question ${state.index + 1}/${state.total}`;
     document.getElementById('quiz-score-text').textContent = `Score : ${state.score}`;
@@ -636,66 +511,33 @@
     document.getElementById('progress-fill').style.width = pct + '%';
   }
 
-  function renderStepTemplate(q, filled) {
-    let s = q.template;
-    s = s.split('{0}').join(filled[0] !== undefined && filled[0] !== null ? filled[0] : '▢');
-    s = s.split('{1}').join(filled[1] !== undefined && filled[1] !== null ? filled[1] : '▢');
-    return s;
-  }
-
   function nextQuestion() {
     if (state.index >= state.total) {
       finishQuiz();
       return;
     }
-    state.currentQuestion = genQuestion(state.mode);
+    state.currentQuestion = genQuestion();
     state.currentAnswer = '';
     state.locked = false;
     updateTopBar();
-    const q = state.currentQuestion;
-    document.getElementById('question-tag').textContent = q.tag;
-
-    if (q.steps) {
-      state.stepIndex = 0;
-      state.stepEntries = ['', ''];
-      state.stepResults = [null, null];
-      document.getElementById('question-text').textContent = renderStepTemplate(q, [null, null]);
-      document.getElementById('question-text').classList.add('long');
-      document.getElementById('question-hint').textContent = q.steps[0].label;
-    } else {
-      document.getElementById('question-text').textContent = q.text;
-      document.getElementById('question-text').classList.remove('long');
-      document.getElementById('question-hint').textContent = q.hint;
-    }
-
+    document.getElementById('question-tag').textContent = state.currentQuestion.tag;
+    document.getElementById('question-text').textContent = state.currentQuestion.text;
+    document.getElementById('question-hint').textContent = state.currentQuestion.hint;
     const disp = document.getElementById('answer-display');
     disp.textContent = 'Ta réponse';
     disp.className = 'answer-display empty';
     document.getElementById('feedback-note').textContent = '';
     document.getElementById('btn-validate').textContent = 'Valider';
-    document.getElementById('btn-validate').disabled = false;
     document.getElementById('btn-skip').style.display = 'block';
-  }
-
-  function currentBuffer() {
-    const q = state.currentQuestion;
-    if (q.steps) return state.stepEntries[state.stepIndex];
-    return state.currentAnswer;
-  }
-  function setCurrentBuffer(val) {
-    const q = state.currentQuestion;
-    if (q.steps) state.stepEntries[state.stepIndex] = val;
-    else state.currentAnswer = val;
   }
 
   function updateAnswerDisplay() {
     const disp = document.getElementById('answer-display');
-    const buf = currentBuffer();
-    if (buf === '') {
-      disp.textContent = 'Ta réponse';
-      disp.className = 'answer-display empty';
+    if (state.currentAnswer === '' || state.currentAnswer === '-') {
+      disp.textContent = state.currentAnswer === '-' ? '-' : 'Ta réponse';
+      disp.className = state.currentAnswer === '-' ? 'answer-display' : 'answer-display empty';
     } else {
-      disp.textContent = buf.replace('.', ',');
+      disp.textContent = state.currentAnswer.replace('.', ',');
       disp.className = 'answer-display';
     }
   }
@@ -704,16 +546,22 @@
     const btn = e.target.closest('button');
     if (!btn || state.locked) return;
     const key = btn.dataset.key;
-    let buf = currentBuffer();
     if (key === 'back') {
-      buf = buf.slice(0, -1);
+      state.currentAnswer = state.currentAnswer.slice(0, -1);
     } else if (key === '.') {
-      if (!buf.includes('.')) buf += (buf === '' ? '0.' : '.');
+      if (!state.currentAnswer.includes('.')) {
+        state.currentAnswer += (state.currentAnswer === '' || state.currentAnswer === '-') ? state.currentAnswer + '0.' : '.';
+      }
+    } else if (key === 'sign') {
+      if (state.currentAnswer.startsWith('-')) {
+        state.currentAnswer = state.currentAnswer.slice(1);
+      } else {
+        state.currentAnswer = '-' + state.currentAnswer;
+      }
     } else {
-      if (buf === '0') buf = key;
-      else buf += key;
+      if (state.currentAnswer === '0') state.currentAnswer = key;
+      else state.currentAnswer += key;
     }
-    setCurrentBuffer(buf);
     updateAnswerDisplay();
   });
 
@@ -721,8 +569,7 @@
     const q = state.currentQuestion;
     const given = parseFR(state.currentAnswer);
     if (isNaN(given)) return null;
-    const diff = Math.abs(given - q.answer);
-    return diff <= (q.tolerance || 0.001);
+    return Math.abs(given - q.answer) <= (q.tolerance || 0.01);
   }
 
   document.getElementById('btn-validate').addEventListener('click', () => {
@@ -731,57 +578,11 @@
       nextQuestion();
       return;
     }
+    if (state.currentAnswer === '' || state.currentAnswer === '-') return;
     const q = state.currentQuestion;
+    const ok = checkAnswer();
     const disp = document.getElementById('answer-display');
     const feedback = document.getElementById('feedback-note');
-
-    if (q.steps) {
-      const buf = state.stepEntries[state.stepIndex];
-      if (buf === '') return;
-      const given = parseFR(buf);
-      const stepDef = q.steps[state.stepIndex];
-      const ok = !isNaN(given) && Math.abs(given - stepDef.value) <= 0.001;
-      state.stepResults[state.stepIndex] = ok;
-
-      const isLastStep = state.stepIndex === q.steps.length - 1;
-
-      if (isLastStep) {
-        state.locked = true;
-        document.getElementById('btn-skip').style.display = 'none';
-        // révèle le gabarit complet avec les vraies valeurs attendues
-        document.getElementById('question-text').textContent = renderStepTemplate(q, [q.steps[0].value, q.steps[1].value]);
-        const allOk = state.stepResults.every(r => r === true);
-        if (allOk) {
-          state.score++;
-          disp.className = 'answer-display correct';
-          feedback.style.color = '#2e7d54';
-          feedback.textContent = '✓ Bonne réponse !';
-          state.history.push({text: q.text, tag: q.tag, status: 'ok'});
-        } else {
-          disp.className = 'answer-display wrong';
-          feedback.style.color = '#b8403a';
-          const firstWrongStep = state.stepResults.indexOf(false);
-          feedback.textContent = `Étape ${firstWrongStep + 1} incorrecte — résultat attendu : ${fmt(q.answer)}`;
-          state.history.push({text: q.text, tag: q.tag, status: 'ko'});
-        }
-        document.getElementById('quiz-score-text').textContent = `Score : ${state.score}`;
-        document.getElementById('btn-validate').textContent = (state.index + 1 >= state.total) ? 'Voir les résultats' : 'Question suivante';
-      } else {
-        // révèle la valeur de cette étape dans le gabarit et passe à l'étape suivante
-        const filled = [state.stepIndex === 0 ? stepDef.value : null, null];
-        document.getElementById('question-text').textContent = renderStepTemplate(q, filled);
-        state.stepIndex++;
-        document.getElementById('question-hint').textContent = q.steps[state.stepIndex].label;
-        disp.textContent = 'Ta réponse';
-        disp.className = 'answer-display empty';
-        feedback.textContent = ok ? '' : '';
-      }
-      return;
-    }
-
-    // Modes à réponse unique (regroupement, ordre de grandeur)
-    if (state.currentAnswer === '') return;
-    const ok = checkAnswer();
     state.locked = true;
     document.getElementById('btn-skip').style.display = 'none';
 
@@ -790,12 +591,13 @@
       disp.className = 'answer-display correct';
       feedback.style.color = '#2e7d54';
       feedback.textContent = '✓ Bonne réponse !';
-      state.history.push({text: q.text, tag: q.tag, status: 'ok'});
+      state.history.push({text: q.text, status: 'ok'});
     } else {
       disp.className = 'answer-display wrong';
       feedback.style.color = '#b8403a';
-      feedback.textContent = `Réponse attendue : ${fmt(q.answer)}`;
-      state.history.push({text: q.text, tag: q.tag, status: 'ko'});
+      const ansStr = (q.answer < 0 ? '−' : '') + Math.abs(q.answer).toString().replace('.', ',');
+      feedback.textContent = `Réponse attendue : ${ansStr}`;
+      state.history.push({text: q.text, status: 'ko'});
     }
     document.getElementById('quiz-score-text').textContent = `Score : ${state.score}`;
     document.getElementById('btn-validate').textContent = (state.index + 1 >= state.total) ? 'Voir les résultats' : 'Question suivante';
@@ -803,9 +605,19 @@
 
   document.getElementById('btn-skip').addEventListener('click', () => {
     if (state.locked) return;
-    state.history.push({text: state.currentQuestion.text, tag: state.currentQuestion.tag, status: 'skip'});
+    state.history.push({text: state.currentQuestion.text, status: 'skip'});
     state.index++;
     nextQuestion();
+  });
+
+  document.getElementById('btn-quiz-restart').addEventListener('click', () => {
+    const confirmLeave = confirm('Recommencer depuis le début ? Ta progression actuelle sera perdue.');
+    if (confirmLeave) {
+      state.index = 0;
+      state.score = 0;
+      state.history = [];
+      nextQuestion();
+    }
   });
 
   // ---------- Ecran résultats ----------
@@ -840,9 +652,6 @@
     state.history = [];
     showScreen('screen-quiz');
     nextQuestion();
-  });
-  document.getElementById('btn-change-mode').addEventListener('click', () => {
-    showScreen('screen-mode');
   });
 
 })();
